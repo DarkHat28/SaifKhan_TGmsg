@@ -1,11 +1,11 @@
 services:
   - name: telegram-bot
     env:
-      - key: TELEGRAM_BOT_TOKEN
-        # 'YOUR_TELEGRAM_BOT_TOKEN' with your actual Telegram bot token
+      - key: BOT_TOKEN
+        # Replace 'YOUR_ACTUAL_BOT_TOKEN' with your real bot token
         value: 6667993850:AAGHHyBka-eXtgQugbU-jZ8AH8gyTj3z010
-      - key: CHAT_ID
-        # 'YOUR_CHAT_ID' with your actual chat ID
-        value: 1107144333
-    buildCommand: docker build -t telegram-bot-image .
-    startCommand: docker run -d -p 8080:8080 -e TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN -e CHAT_ID=$CHAT_ID telegram-bot-image
+      - key: 1107144333
+        # Replace 'YOUR_ACTUAL_CHAT_ID' with your real chat ID
+        value: YOUR_ACTUAL_CHAT_ID
+    buildCommand: python main.py
+    startCommand: python main.py
