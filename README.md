@@ -1,5 +1,4 @@
-# 🤖 SaifKhan_TGmsg
-<h1 align="center">Telegram_msg</h1>
+<h1 align="center">🤖SaifKhan_TGmsg</h1>
 
 <p align="center">
   <b>A powerful and customizable Telegram bot to simplify your tasks and enhance your group/channel experience.</b>
