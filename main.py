@@ -5,15 +5,15 @@ Contact me: @Saitama_AU\n\n"
         "https://t.me/TechSaifTG
 """
 
-
 import os
-from telegram import Update
+from telegram import Update, ChatAction
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # Replace sensitive data with environment variables
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-USER_ID = int(os.environ.get('USER_ID'))
-CHANNEL_A_ID = int(os.environ.get('CHANNEL_A_ID'))
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+USER_ID = int(os.getenv('USER_ID'))
+
+last_forwarded_message_id = None
 
 def forward_message(update: Update, context: CallbackContext):
     try:
@@ -23,10 +23,6 @@ def forward_message(update: Update, context: CallbackContext):
             return
 
         chat_id = int(destination_channel)
-        if chat_id == CHANNEL_A_ID:
-            update.message.reply_text("You cannot forward messages to Channel A.")
-            return
-
         forwarded_message = update.message.forward(chat_id=chat_id)
         update.message.reply_text(f"Message forwarded to {destination_channel} successfully!")
 
@@ -35,13 +31,58 @@ def forward_message(update: Update, context: CallbackContext):
     except Exception as e:
         update.message.reply_text(f"Failed to forward the message. Error: {e}")
 
+def forward_old_messages(update: Update, context: CallbackContext):
+    try:
+        destination_channel = context.args[0] if context.args else None
+        if not destination_channel:
+            update.message.reply_text("Please provide a destination channel.")
+            return
+
+        chat_id = int(destination_channel)
+
+        global last_forwarded_message_id
+
+        # Fetch and forward older messages
+        messages = update.message.chat.get_chat_history(limit=100, offset_id=last_forwarded_message_id)
+        for message in messages:
+            # Skip deleted messages, polls, contacts, and locations
+            if message.delete_for_all or message.poll or message.contact or message.location:
+                continue
+
+            # Check if the message contains media files
+            if message.photo:
+                message.photo[-1].forward(chat_id=chat_id)
+            elif message.video:
+                message.video.forward(chat_id=chat_id)
+            elif message.audio:
+                message.audio.forward(chat_id=chat_id)
+            elif message.voice:
+                message.voice.forward(chat_id=chat_id)
+            elif message.sticker:
+                message.sticker.forward(chat_id=chat_id)
+            # Add more conditions for other media types (documents, animations, etc.) if needed
+
+            # Update the last forwarded message ID
+            last_forwarded_message_id = message.message_id
+
+        if messages:
+            update.message.reply_text(f"Batch of 100 messages forwarded to {destination_channel} successfully!")
+        else:
+            update.message.reply_text("No more messages to forward.")
+
+    except ValueError:
+        update.message.reply_text("Invalid channel ID provided.")
+    except Exception as e:
+        update.message.reply_text(f"Failed to forward messages. Error: {e}")
+
 def help_command(update: Update, context: CallbackContext):
     help_text = (
         "Welcome to Telegram_msg bot!\n\n"
         "Available commands:\n"
         "/start - Start the bot and view a welcome message.\n"
         "/help - Display this help menu.\n"
-        "/forward <destination_channel> - Forward the message to the specified channel."
+        "/forward <destination_channel> - Forward the message to the specified channel.\n"
+        "/old_msg <destination_channel> - Forward older messages with media files to the specified channel."
     )
     update.message.reply_text(help_text)
 
@@ -64,6 +105,7 @@ def main():
     dp.add_handler(CommandHandler("start", start_command))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("forward", forward_message, pass_args=True))
+    dp.add_handler(CommandHandler("old_msg", forward_old_messages, pass_args=True))
 
     # Error handling for all other update types
     dp.add_error_handler(error_handler)
@@ -81,3 +123,4 @@ def error_handler(update: Update, context: CallbackContext):
 
 if __name__ == "__main__":
     main()
+
