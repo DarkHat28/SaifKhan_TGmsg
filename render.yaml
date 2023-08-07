@@ -4,8 +4,8 @@ services:
       - key: BOT_TOKEN
         # Replace 'YOUR_ACTUAL_BOT_TOKEN' with your real bot token
         value: 6667993850:AAGHHyBka-eXtgQugbU-jZ8AH8gyTj3z010
-      - key: 1107144333
+      - key: CHAT_ID
         # Replace 'YOUR_ACTUAL_CHAT_ID' with your real chat ID
-        value: YOUR_ACTUAL_CHAT_ID
+        value: 1107144333
     buildCommand: python main.py
     startCommand: python main.py
