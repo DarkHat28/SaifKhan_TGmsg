@@ -11,7 +11,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 # Replace sensitive data with environment variables
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-USER_ID = int(os.getenv('USER_ID'))
+USER_ID = int(os.getenv('CHAT_ID'))
 
 last_forwarded_message_id = None
 
@@ -19,7 +19,7 @@ def forward_message(update: Update, context: CallbackContext):
     try:
         destination_channel = context.args[0] if context.args else None
         if not destination_channel:
-            update.message.reply_text("Please provide a destination channel.")
+            update.message.reply_text("Please provide a destination's channel CHAT_ID, eg: /forward 123456789.")
             return
 
         chat_id = int(destination_channel)
@@ -35,7 +35,7 @@ def forward_old_messages(update: Update, context: CallbackContext):
     try:
         destination_channel = context.args[0] if context.args else None
         if not destination_channel:
-            update.message.reply_text("Please provide a destination channel.")
+            update.message.reply_text("Please provide a destination's channel ID, eg: /forward 123456789.")
             return
 
         chat_id = int(destination_channel)
