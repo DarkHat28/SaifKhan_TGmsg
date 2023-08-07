@@ -8,4 +8,4 @@ services:
         # Replace 'YOUR_ACTUAL_CHAT_ID' with your real chat ID
         value: 1107144333
     buildCommand: python main.py
-    worker: python3 main.py
+    startCommand: python3 main.py
